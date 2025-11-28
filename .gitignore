@@ -1,103 +1,57 @@
-# 依赖目录
+# Dependencies
 node_modules/
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
+.pnp
+.pnp.js
 
-# 构建输出
-dist/
-build/
+# Testing
+coverage/
+
+# Next.js
+.next/
 out/
-*.egg-info/
-.eggs/
+build/
+dist/
 
-# 环境变量和配置
-.env
-.env.local
-.env.*.local
-*.env
-
-# 日志文件
+# Production
 *.log
-logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# 编辑器目录和文件
+# Local env files
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# OS
 .DS_Store
 Thumbs.db
 
-# 操作系统文件
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Desktop.ini
-
-# 测试覆盖率
-coverage/
-*.lcov
-.nyc_output/
-
-# 临时文件
-*.tmp
-*.temp
-.cache/
-.parcel-cache/
-.vite/
-
-# Python 虚拟环境
-venv/
-env/
-ENV/
-env.bak/
-venv.bak/
+# Python (old server)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
 .venv/
-
-# 包管理器锁文件（可选，根据团队需求决定是否忽略）
-# pnpm-lock.yaml
-# package-lock.json
-# yarn.lock
-
-# 数据库文件
-*.db
-*.sqlite
-*.sqlite3
-
-# 备份文件
-*.bak
-*.backup
-*~
-
-# 压缩文件
-*.zip
-*.tar
-*.tar.gz
-*.rar
-
-# IDE 特定文件
-*.sublime-project
-*.sublime-workspace
-.project
-.classpath
-.settings/
-
-# 其他
-*.pid
-*.seed
-*.pid.lock
-
-# 其他工具文件目录
-.promptx/
+venv/
+ENV/
+env/

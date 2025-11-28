@@ -1,10 +1,10 @@
 # Sentinel Review - 内容审查系统
 
+[![Next.js](https://img.shields.io/badge/Framework-Next.js_15-black)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/Frontend-React_19-blue)](https://reactjs.org/)
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-green)](https://fastapi.tiangolo.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-Sentinel Review 是一个现代化的内容审查系统，结合了人工智能分析和人工复核机制，并通过图像模糊与文本毒性降低来保护人类审核员的心理健康。系统采用前后端分离架构，前端基于 React + Tailwind CSS 构建，提供直观易用的三栏式界面；后端使用 FastAPI 实现安全的中间层服务，保护敏感的 API 密钥。
+Sentinel Review 是一个现代化的内容审查系统，结合了人工智能分析和人工复核机制，并通过图像模糊与文本毒性降低来保护人类审核员的心理健康。系统采用 Next.js 全栈架构，前端基于 React + Tailwind CSS 构建，提供直观易用的三栏式界面；后端使用 Next.js API Routes 实现安全的中间层服务，保护敏感的 API 密钥。
 
 ## 🔍 功能特性
 
@@ -12,23 +12,23 @@ Sentinel Review 是一个现代化的内容审查系统，结合了人工智能�
 - **人机协同**: 提供直观的界面供人工复核 AI 分析结果
 - **双模式支持**: 支持单条内容审查和批量内容审查
 - **多媒体支持**: 同时支持文本和图像内容的审查
-- **本地文件处理**: 自动处理本地图片文件上传
+- **本地文件处理**: 自动处理本地图片文件上传（开发环境）
+- **远程 URL 支持**: 支持远程图片 URL（生产环境）
 - **安全架构**: 通过中间层隐藏敏感凭证，保障系统安全
 - **响应式设计**: 基于 Tailwind CSS 的现代化 UI 设计
 - **国际化支持**: 内置中英文界面切换
+- **Netlify 部署**: 支持一键部署到 Netlify 平台
 
 ## 📦 安装与配置
 
 ### 环境要求
 
 - Node.js ≥ 18
-- Python ≥ 3.8
 - Dify 平台账号及相关配置
 
-### 前端安装
+### 安装依赖
 
 ```bash
-cd frontend
 npm install
 # 或者使用 yarn
 yarn install
@@ -36,82 +36,177 @@ yarn install
 pnpm install
 ```
 
-### 后端安装
-
-```bash
-cd server
-# 使用 venv 创建虚拟环境
-python -m venv .venv
-. .venv/Scripts/activate  # Windows
-# 或 source .venv/bin/activate (Linux/Mac)
-# 使用 conda 创建虚拟环境
-conda create -n sentinel-review python=3.10
-conda activate sentinel-review
-pip install -r requirements.txt
-```
-
 ### 环境配置
 
-1. 前端配置：
+1. 复制环境变量示例文件：
    ```bash
-   cd frontend
-   cp env.example .env
-   ```
-   在 `frontend/.env` 文件中设置：
-   ```
-   VITE_PROXY_BASE_URL=http://localhost:9000
+   cp .env.local.example .env.local
    ```
 
-2. 后端配置：
-   ```bash
-   cd server
-   cp env.example .env
-   ```
-   在 `server/.env` 文件中设置 Dify 相关参数：
+2. 在 `.env.local` 文件中设置 Dify 相关参数：
    ```
    DIFY_BASE_URL=https://api.dify.ai/v1
    DIFY_API_KEY=your_api_key
    DIFY_APP_ID=your_app_id
-   DIFY_USER_ID=your_user_id
+   DIFY_USER_ID=sentinel-review-web
    ```
 
-### 快速启动
+### 全栈启动方式
 
-1. 启动后端服务：
-   ```bash
-   cd server
-   uvicorn main:app --reload --port 9000
-   ```
+本项目采用 Next.js 全栈架构，前后端集成在同一个应用中，无需分别启动。
 
-2. 启动前端应用：
+#### 开发模式（推荐）
+
+启动开发服务器，同时运行前端和 API 后端：
+
+```bash
+npm run dev
+# 或者使用 yarn
+yarn dev
+# 或者使用 pnpm
+pnpm dev
+```
+
+启动后：
+- **前端界面**: http://localhost:3000
+- **API 端点**: http://localhost:3000/api/review/single、http://localhost:3000/api/review/batch 等
+- 支持热重载，代码修改后自动刷新
+
+#### 生产模式
+
+1. **构建项目**：
    ```bash
-   cd frontend
-   npm run dev
+   npm run build
    # 或者使用 yarn
-   yarn dev
+   yarn build
    # 或者使用 pnpm
-   pnpm dev
+   pnpm build
    ```
 
-访问 http://localhost:5173 查看应用。
+2. **启动生产服务器**：
+   ```bash
+   npm start
+   # 或者使用 yarn
+   yarn start
+   # 或者使用 pnpm
+   pnpm start
+   ```
 
+   生产服务器默认运行在 http://localhost:3000
+
+#### 架构说明
+
+- **前端**: Next.js App Router 自动处理 React 组件渲染
+- **后端**: Next.js API Routes (`app/api/`) 处理所有 API 请求
+- **统一端口**: 前后端共享同一个端口（默认 3000），无需配置代理
+- **类型安全**: TypeScript 确保前后端类型一致性
+
+## 🚀 Netlify 部署
+
+### 部署步骤
+
+1. **准备环境变量**：
+   - 在 Netlify 控制台的 "Site settings" > "Environment variables" 中添加：
+     - `DIFY_BASE_URL`
+     - `DIFY_API_KEY`
+     - `DIFY_APP_ID`
+     - `DIFY_USER_ID`（可选，默认为 `sentinel-review-web`）
+
+2. **连接仓库**：
+   - 将代码推送到 Git 仓库（GitHub、GitLab 等）
+   - 在 Netlify 中连接仓库
+
+3. **构建配置**：
+   - Build command: `npm run build`
+   - Publish directory: `.next`
+   - Netlify 会自动检测 `netlify.toml` 配置
+
+4. **注意事项**：
+   - 批量审核功能中的本地文件路径（如 `D:\materials\1.png`）在 Netlify 上不可用
+   - 请使用远程 URL（如 `https://example.com/image.jpg`）
+   - 系统会自动检测环境并提示用户使用远程 URL
 
 ## 🏗 项目结构
 
 ```
 .
-├── frontend/                    # 前端应用
-│   ├── components/              # React 组件
-│   │   ├── ui/                  # 通用UI组件
-│   │   ├── LeftPanel.tsx        # 左侧面板(输入区域)
-│   │   ├── CenterPanel.tsx      # 中间面板(核心复核区域)
-│   │   └── RightPanel.tsx       # 右侧面板(进度与AI分析)
-│   ├── services/                # API服务
-│   │   └── dify.ts              # Dify API集成
-│   ├── App.tsx                  # 主应用容器
-│   └── ...
-└── server/                      # 后端服务(FastAPI)
-    ├── main.py                  # 应用入口
-    ├── requirements.txt         # Python依赖
-    └── README.md                # 后端说明文档
+├── app/                          # Next.js App Router
+│   ├── api/                      # API Routes
+│   │   ├── review/
+│   │   │   ├── single/          # 单条审核 API
+│   │   │   └── batch/           # 批量审核 API
+│   │   └── health/              # 健康检查 API
+│   ├── layout.tsx               # 根布局
+│   ├── page.tsx                 # 主页面
+│   └── globals.css              # 全局样式
+├── components/                   # React 组件
+│   ├── ui/                      # 通用UI组件
+│   │   ├── Badge.tsx
+│   │   ├── Toast.tsx
+│   │   └── Tooltip.tsx
+│   ├── LeftPanel.tsx            # 左侧面板(输入区域)
+│   ├── CenterPanel.tsx          # 中间面板(核心复核区域)
+│   └── RightPanel.tsx           # 右侧面板(进度与AI分析)
+├── lib/                          # 共享库
+│   ├── services/                # 服务层
+│   │   ├── review.ts            # 审核服务（前端调用）
+│   │   └── reviewEngine.ts      # Dify 审核引擎（后端）
+│   ├── utils/                   # 工具函数
+│   │   └── batchParser.ts      # 批量模板解析
+│   ├── types.ts                 # TypeScript 类型定义
+│   ├── translations.ts          # 国际化资源
+│   └── mockData.ts             # 演示数据
+├── public/                       # 静态资源
+│   └── logo.png
+├── next.config.js               # Next.js 配置
+├── netlify.toml                 # Netlify 部署配置
+├── tailwind.config.js           # Tailwind CSS 配置
+└── package.json                 # 项目依赖
 ```
+
+## 📝 API 规范
+
+详细的 API 规范请参考 [docs/api-spec.md](docs/api-spec.md)。
+
+### 主要 API 端点
+
+- `POST /api/review/single` - 单条样本审核
+- `POST /api/review/batch` - 批量样本审核
+- `GET /api/health` - 健康检查
+
+## 🔧 开发说明
+
+### 技术栈
+
+- **框架**: Next.js 15 (App Router) - 全栈框架
+- **前端**: React 19 + TypeScript
+- **后端**: Next.js API Routes (Route Handlers)
+- **样式**: Tailwind CSS
+- **图标**: Lucide React
+- **文件处理**: XLSX (CSV/Excel 解析)
+- **HTTP 客户端**: 内置 fetch API（Node.js 18+）
+
+### 全栈架构优势
+
+- **统一开发**: 前后端代码在同一项目中，共享类型定义和工具函数
+- **无需代理**: 前端直接调用 `/api/*` 相对路径，Next.js 自动路由到 API Routes
+- **类型安全**: TypeScript 类型在前后端之间共享，减少接口不一致问题
+- **热重载**: 修改前端或后端代码都会自动重新加载
+- **部署简单**: 单命令构建，单进程运行
+
+### 本地文件路径限制
+
+- **开发环境**: 支持本地文件系统路径（如 `D:\materials\1.png`）
+- **生产环境（Netlify/Vercel）**: 仅支持远程 URL，本地路径会返回错误提示
+
+### 代码规范
+
+- 使用 TypeScript 进行类型检查
+- 遵循 Next.js App Router 最佳实践
+- 客户端组件使用 `'use client'` 指令
+- API Routes 使用 Route Handlers (`app/api/*/route.ts`)
+- 共享代码放在 `lib/` 目录，前后端均可使用
+
+## 📄 许可证
+
+MIT License
