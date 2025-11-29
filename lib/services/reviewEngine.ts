@@ -1,26 +1,32 @@
+// 服务端专用模块 - 使用 Node.js fs 模块，只能在服务端运行
 import { promises as fs } from 'fs';
 import path from 'path';
 import FormData from 'form-data';
 
-// 环境变量配置
-const DIFY_BASE_URL = process.env.DIFY_BASE_URL;
-const DIFY_API_KEY = process.env.DIFY_API_KEY;
-const DIFY_APP_ID = process.env.DIFY_APP_ID;
-const DIFY_USER_ID = process.env.DIFY_USER_ID || 'sentinel-review-web';
+// 获取环境变量（延迟到运行时读取）
+function getEnvConfig(): EngineConfig {
+  const DIFY_BASE_URL = process.env.DIFY_BASE_URL;
+  const DIFY_API_KEY = process.env.DIFY_API_KEY;
+  const DIFY_APP_ID = process.env.DIFY_APP_ID;
+  const DIFY_USER_ID = process.env.DIFY_USER_ID || 'sentinel-review-web';
 
-// 检查必需的环境变量
-const REQUIRED_ENV = {
-  DIFY_BASE_URL,
-  DIFY_API_KEY,
-  DIFY_APP_ID,
-};
+  // 检查必需的环境变量
+  const missing: string[] = [];
+  if (!DIFY_BASE_URL) missing.push('DIFY_BASE_URL');
+  if (!DIFY_API_KEY) missing.push('DIFY_API_KEY');
+  if (!DIFY_APP_ID) missing.push('DIFY_APP_ID');
 
-const missing = Object.entries(REQUIRED_ENV)
-  .filter(([_, value]) => !value)
-  .map(([key]) => key);
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+  }
 
-if (missing.length > 0) {
-  throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+  // 此时已经确保这些值不为 undefined
+  return {
+    baseUrl: DIFY_BASE_URL as string,
+    apiKey: DIFY_API_KEY as string,
+    appId: DIFY_APP_ID as string,
+    userId: DIFY_USER_ID,
+  };
 }
 
 // 审核引擎配置
@@ -52,12 +58,24 @@ export class DifyReviewEngine {
   private timeout: number;
 
   constructor(config?: Partial<EngineConfig>) {
-    this.config = {
-      baseUrl: config?.baseUrl || DIFY_BASE_URL!,
-      apiKey: config?.apiKey || DIFY_API_KEY!,
-      appId: config?.appId || DIFY_APP_ID!,
-      userId: config?.userId || DIFY_USER_ID,
-    };
+    // 如果提供了完整配置，使用提供的配置；否则从环境变量读取
+    if (config?.baseUrl && config?.apiKey && config?.appId) {
+      this.config = {
+        baseUrl: config.baseUrl,
+        apiKey: config.apiKey,
+        appId: config.appId,
+        userId: config.userId || 'sentinel-review-web',
+      };
+    } else {
+      // 延迟到运行时读取环境变量
+      const envConfig = getEnvConfig();
+      this.config = {
+        baseUrl: config?.baseUrl || envConfig.baseUrl,
+        apiKey: config?.apiKey || envConfig.apiKey,
+        appId: config?.appId || envConfig.appId,
+        userId: config?.userId || envConfig.userId,
+      };
+    }
     this.timeout = 60000; // 60秒超时
   }
 
@@ -234,6 +252,22 @@ export class DifyReviewEngine {
   }
 }
 
-// 导出单例实例
-export const reviewEngine = new DifyReviewEngine();
+// 懒加载单例实例（延迟到首次使用时创建，避免构建时读取环境变量）
+let reviewEngineInstance: DifyReviewEngine | null = null;
+
+export function getReviewEngine(): DifyReviewEngine {
+  if (!reviewEngineInstance) {
+    reviewEngineInstance = new DifyReviewEngine();
+  }
+  return reviewEngineInstance;
+}
+
+// 为了保持向后兼容，导出单例实例（但会在首次访问时创建）
+export const reviewEngine = new Proxy({} as DifyReviewEngine, {
+  get(_target, prop) {
+    const instance = getReviewEngine();
+    const value = instance[prop as keyof DifyReviewEngine];
+    return typeof value === 'function' ? value.bind(instance) : value;
+  },
+});
 
