@@ -148,7 +148,7 @@ function Dashboard() {
         !outputs.photo &&
         !outputs.text;
 
-      if (hasOnlyType) {
+      if (hasOnlyType && outputs.type) {
         showToast(
           `${translations[language].toast.reviewResult} ${outputs.type}`,
           'success',

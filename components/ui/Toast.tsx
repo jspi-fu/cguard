@@ -1,9 +1,9 @@
 'use client'
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { CheckCircle, AlertCircle, X, Info } from 'lucide-react';
+import { CheckCircle, AlertCircle, X, Info, AlertTriangle } from 'lucide-react';
 
-type ToastType = 'success' | 'destructive' | 'info';
+type ToastType = 'success' | 'destructive' | 'info' | 'warning';
 
 interface Toast {
   id: number;
@@ -52,11 +52,13 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               ${toast.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : ''}
               ${toast.type === 'destructive' ? 'bg-red-50 border-red-200 text-red-800' : ''}
               ${toast.type === 'info' ? 'bg-white border-slate-200 text-slate-800' : ''}
+              ${toast.type === 'warning' ? 'bg-yellow-50 border-yellow-200 text-yellow-800' : ''}
             `}
           >
             {toast.type === 'success' && <CheckCircle className="w-4 h-4 text-green-600" />}
             {toast.type === 'destructive' && <AlertCircle className="w-4 h-4 text-red-600" />}
             {toast.type === 'info' && <Info className="w-4 h-4 text-slate-600" />}
+            {toast.type === 'warning' && <AlertTriangle className="w-4 h-4 text-yellow-600" />}
             <span>{toast.message}</span>
             <button onClick={() => removeToast(toast.id)} className="ml-2 text-current opacity-50 hover:opacity-100">
               <X className="w-3 h-3" />
