@@ -1,4 +1,5 @@
 // 服务端专用模块 - 使用 Node.js fs 模块，只能在服务端运行
+import 'server-only';
 import { promises as fs } from 'fs';
 import path from 'path';
 import FormData from 'form-data';

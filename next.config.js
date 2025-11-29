@@ -26,6 +26,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  // 确保服务端环境变量不会在构建时被替换到客户端代码中
+  // 只有 NEXT_PUBLIC_ 前缀的环境变量会被替换到客户端
+  // DIFY_* 变量只在服务端使用，不会被打包到客户端
 }
 
 module.exports = nextConfig

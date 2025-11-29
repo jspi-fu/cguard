@@ -7,6 +7,9 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  # 告诉 Netlify 这些环境变量名是预期的，不是实际密钥值
+  # 这些变量应该在 Netlify 控制台中配置，而不是提交到仓库
+  SECRETS_SCAN_OMIT_KEYS = "DIFY_API_KEY,DIFY_APP_ID,DIFY_BASE_URL,DIFY_USER_ID"
 
 # Next.js 会自动处理 API 路由，无需额外重定向
 
